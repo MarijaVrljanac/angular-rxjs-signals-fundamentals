@@ -10,6 +10,11 @@ import {
   take,
   tap,
   timer,
+  range,
+  delay,
+  concatMap,
+  mergeMap,
+  switchMap
 } from 'rxjs';
 
 @Component({
@@ -110,6 +115,22 @@ export class App implements OnInit, OnDestroy {
         error: (error) => console.log('Timer error occured: ', error),
         complete: () => console.log('No more ticks'),
       });
+
+    range(1, 5)
+      .pipe(concatMap((i) => of(i).pipe(delay(this.randomDelay()))))
+      .subscribe((v) => console.log('concatMap:', v));
+
+    range(11, 5)
+      .pipe(mergeMap((i) => of(i).pipe(delay(this.randomDelay()))))
+      .subscribe((v) => console.log('mergeMap:', v));
+
+    range(21, 5)
+      .pipe(switchMap((i) => of(i).pipe(delay(this.randomDelay()))))
+      .subscribe((v) => console.log('switchMap:', v));
+  }
+
+  randomDelay() {
+    return Math.floor(Math.random() * 1000) + 500;
   }
 
   ngOnDestroy(): void {
