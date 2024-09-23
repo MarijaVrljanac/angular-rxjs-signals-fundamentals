@@ -5,6 +5,7 @@ import {
   map,
   Observable,
   of,
+  shareReplay,
   switchMap,
   tap,
   throwError,
@@ -24,12 +25,11 @@ export class ProductService {
   private errorService = inject(HttpErrorService);
   private reviewService = inject(ReviewService);
 
-  getProducts(): Observable<Product[]> {
-    return this.http.get<Product[]>(this.productsUrl).pipe(
-      tap(() => console.log('In http.get pipeline')),
-      catchError((err) => this.handleError(err))
-    );
-  }
+  readonly products$ = this.http.get<Product[]>(this.productsUrl).pipe(
+    tap((p) => console.log(JSON.stringify(p))),
+    shareReplay(1),
+    catchError((err) => this.handleError(err))
+  );
 
   getProduct(id: number): Observable<Product> {
     const productUrl = this.productsUrl + '/' + id;
