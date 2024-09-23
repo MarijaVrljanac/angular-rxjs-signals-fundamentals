@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 
 import { CurrencyPipe, NgFor, NgIf } from '@angular/common';
-import { Subscription } from 'rxjs';
+import { catchError, EMPTY, Subscription } from 'rxjs';
 import { Product } from '../product';
 import { ProductService } from '../product.service';
 
@@ -38,6 +38,12 @@ export class ProductDetailComponent implements OnChanges, OnDestroy {
     if (id) {
       this.sub = this.productService
         .getProduct(id)
+        .pipe(
+          catchError((err) => {
+            this.errorMessage = err;
+            return EMPTY;
+          })
+        )
         .subscribe((product) => (this.product = product));
     }
   }

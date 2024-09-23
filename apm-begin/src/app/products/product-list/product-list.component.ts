@@ -1,7 +1,7 @@
 import { Component, inject, OnDestroy, OnInit } from '@angular/core';
 
 import { NgClass, NgFor, NgIf } from '@angular/common';
-import { Subscription, tap } from 'rxjs';
+import { catchError, EMPTY, Subscription, tap } from 'rxjs';
 import { Product } from '../product';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
 import { ProductService } from '../product.service';
@@ -29,10 +29,19 @@ export class ProductListComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.sub = this.productService
       .getProducts()
-      .pipe(tap(() => console.log('In component pipeline')))
-      .subscribe((products) => {
-        this.products = products;
-        console.log(this.products);
+      .pipe(
+        tap(() => console.log('In component pipeline')),
+        catchError((err) => {
+          this.errorMessage = err;
+          return EMPTY;
+        })
+      )
+      .subscribe({
+        next: (products) => {
+          this.products = products;
+          console.log(this.products);
+        },
+        error: (err) => (this.errorMessage = err),
       });
   }
   ngOnDestroy(): void {
@@ -42,4 +51,7 @@ export class ProductListComponent implements OnInit, OnDestroy {
   onSelected(productId: number): void {
     this.selectedProductId = productId;
   }
+}
+function next(value: Product[]): void {
+  throw new Error('Function not implemented.');
 }
