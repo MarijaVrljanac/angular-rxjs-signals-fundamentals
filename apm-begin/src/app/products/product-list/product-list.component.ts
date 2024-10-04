@@ -1,7 +1,6 @@
 import { Component, inject } from '@angular/core';
 
 import { AsyncPipe, NgClass, NgFor, NgIf } from '@angular/common';
-import { catchError, EMPTY } from 'rxjs';
 import { Product } from '../product';
 import { ProductDetailComponent } from '../product-detail/product-detail.component';
 import { ProductService } from '../product.service';
@@ -15,20 +14,21 @@ import { ProductService } from '../product.service';
 export class ProductListComponent {
   // Just enough here for the template to compile
   pageTitle = 'Products';
-  errorMessage = '';
 
   private productService = inject(ProductService);
 
   // Products
-  readonly products$ = this.productService.products$.pipe(
-    catchError((err) => {
-      this.errorMessage = err;
-      return EMPTY;
-    })
-  );
+  // readonly products$ = this.productService.products$.pipe(
+  //   catchError((err) => {
+  //     this.errorMessage = err;
+  //     return EMPTY;
+  //   })
+  // );
+  products = this.productService.products;
+  errorMessage = this.productService.productsError;
 
   // Selected product id to highlight the entry
-  readonly selectedProductId$ = this.productService.productSelected$;
+  selectedProductId = this.productService.selectedProductId;
 
   onSelected(productId: number): void {
     // this.selectedProductId = productId;
